@@ -1,0 +1,68 @@
+name: 更新 A 股收盘档案并发布
+
+on:
+  schedule:
+    # GitHub cron 使用 UTC：07:30 = 北京时间 15:30。
+    - cron: "30 7 * * 1-5"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "site/data/records.json"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: 读取仓库
+        uses: actions/checkout@v4
+
+      - name: 准备 Node.js
+        if: github.event_name != 'push'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: 获取当天收盘数据
+        if: github.event_name != 'push'
+        run: node scripts/update-market-data.mjs
+
+      - name: 保存新的交易日记录
+        if: github.event_name != 'push'
+        shell: bash
+        run: |
+          if git diff --quiet -- site/data/records.json; then
+            echo "没有新的交易日数据"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data/records.json
+          git commit -m "data: update A-share close archive"
+          git push
+
+      - name: 配置 GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: 打包网站
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: 发布到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
