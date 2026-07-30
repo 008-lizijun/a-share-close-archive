@@ -37,6 +37,20 @@ if (minutes < 15 * 60 + 30) {
 }
 
 const fields = "f57,f58,f43,f55,f116,f162,f170,f86";
+const forecastsPath = path.resolve("site/data/forecasts.json");
+const forecastPayload = JSON.parse(await fs.readFile(forecastsPath, "utf8"));
+
+for (const stock of stocks) {
+  const forecast = forecastPayload?.stocks?.[stock.code];
+  if (
+    !forecast ||
+    ["revenue", "netProfit", "eps"].some(
+      (field) => !Number.isFinite(Number(forecast[field])),
+    )
+  ) {
+    throw new Error(`${stock.name} 的 2026E 预测数据不完整`);
+  }
+}
 
 async function fetchQuote(stock) {
   const url =
@@ -110,6 +124,12 @@ const rows = rawRows.map((data, index) => {
     pe: Number(data.f162),
     changePercent: Number(data.f170),
     quoteTime,
+    forecast2026: {
+      revenue: Number(forecastPayload.stocks[stocks[index].code].revenue),
+      netProfit: Number(forecastPayload.stocks[stocks[index].code].netProfit),
+      eps: Number(forecastPayload.stocks[stocks[index].code].eps),
+      asOf: forecastPayload.asOf,
+    },
   };
 });
 
