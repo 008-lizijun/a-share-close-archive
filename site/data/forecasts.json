@@ -1,0 +1,72 @@
+{
+  "asOf": "2026-07-30",
+  "method": "2026E 营业收入、归母净利润和 EPS 采用最近六个月公开卖方报告的一致预期均值；2026E PE 按每个交易日收盘价除以 2026E EPS 计算。",
+  "stocks": {
+    "300308": {
+      "name": "中际旭创",
+      "revenue": 948.6,
+      "netProfit": 300.92,
+      "eps": 27.06,
+      "coverage": 32,
+      "sourceDate": "2026-07-30",
+      "sourceTitle": "同花顺机构一致预期（含卖方明细）",
+      "sourceUrl": "https://basic.10jqka.com.cn/144/300308/worth.html",
+      "basis": "800G 与 1.6T 光模块放量、硅光渗透率提升，以及海外云厂商 AI 资本开支增长。"
+    },
+    "000938": {
+      "name": "紫光股份",
+      "revenue": 1202,
+      "netProfit": 28.41,
+      "eps": 0.99,
+      "coverage": 20,
+      "sourceDate": "2026-07-28",
+      "sourceTitle": "同花顺机构一致预期（含卖方明细）",
+      "sourceUrl": "https://basic.10jqka.com.cn/000938/worth.html",
+      "basis": "AI 服务器与高速交换机需求增长、国产算力建设，以及新华三持股比例提升。"
+    },
+    "300502": {
+      "name": "新易盛",
+      "revenue": 509.52,
+      "netProfit": 188.47,
+      "eps": 13.77,
+      "coverage": 21,
+      "sourceDate": "2026-07-29",
+      "sourceTitle": "同花顺机构一致预期（含卖方明细）",
+      "sourceUrl": "https://basic.10jqka.com.cn/144/300502/worth.html",
+      "basis": "800G 与 1.6T 高速光模块需求、扩产与备货节奏，以及高端产品结构改善。"
+    },
+    "688008": {
+      "name": "澜起科技",
+      "revenue": 72.82,
+      "netProfit": 32.63,
+      "eps": 2.68,
+      "coverage": 17,
+      "sourceDate": "2026-07-26",
+      "sourceTitle": "同花顺机构一致预期（含卖方明细）",
+      "sourceUrl": "https://basic.10jqka.com.cn/48/688008/worth.html",
+      "basis": "DDR5 内存接口芯片升级、AI 数据中心互连需求，以及 CXL 等新产品逐步贡献。"
+    },
+    "601138": {
+      "name": "工业富联",
+      "revenue": 14900,
+      "netProfit": 611.4,
+      "eps": 3.08,
+      "coverage": 21,
+      "sourceDate": "2026-07-21",
+      "sourceTitle": "同花顺机构一致预期（含卖方明细）",
+      "sourceUrl": "https://basic.10jqka.com.cn/48/601138/worth.html",
+      "basis": "AI 服务器机柜放量、800G 以上交换机增长，以及下一代平台和 CPO 产品推进。"
+    },
+    "000977": {
+      "name": "浪潮信息",
+      "revenue": 2187.84,
+      "netProfit": 40.05,
+      "eps": 2.73,
+      "coverage": 19,
+      "sourceDate": "2026-07-21",
+      "sourceTitle": "同花顺机构一致预期（含卖方明细）",
+      "sourceUrl": "https://basic.10jqka.com.cn/000977/worth.html",
+      "basis": "国内 AI 服务器与超节点需求增长、供应链改善，以及产品结构带动利润率修复。"
+    }
+  }
+}
