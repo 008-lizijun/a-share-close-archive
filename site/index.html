@@ -5,115 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="每日记录中际旭创、紫光股份、新易盛、澜起科技、工业富联、浪潮信息的 A 股收盘数据。"
+      content="每日记录六只 A 股科技公司的收盘数据、2026 年机构一致预期，并支持按日期导出 XLSX。"
     />
     <meta name="theme-color" content="#f4f1ea" />
-    <meta property="og:title" content="收盘录｜A 股科技股每日收盘档案" />
+    <meta property="og:title" content="每日股价报告" />
     <meta
       property="og:description"
-      content="交易日收市后，自动记录六只 A 股科技股的股价、市值、每股收益和市盈率。"
+      content="A 股收盘数据、2026 年业绩预测与每日 XLSX 导出。"
     />
-    <title>收盘录｜A 股科技股每日收盘档案</title>
+    <meta property="og:image" content="./og.png" />
+    <title>每日股价报告</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css" />
+    <script
+      src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"
+      defer
+    ></script>
     <script src="./app.js" defer></script>
   </head>
   <body>
-    <header class="site-header">
-      <a class="brand" href="#top" aria-label="收盘录首页">
-        <span class="brand-mark">收</span>
-        <span>收盘录</span>
-      </a>
-      <div class="header-status">
-        <span class="pulse" aria-hidden="true"></span>
-        北京时间 15:30 自动归档
-      </div>
-    </header>
-
     <main>
-      <section class="hero" id="top">
-        <div class="hero-copy">
-          <p class="eyebrow">A 股 · AI 算力观察清单</p>
-          <h1>每一次收盘，<br />都有迹可循。</h1>
-          <p class="intro">
-            跟踪六家核心科技公司。交易日收市后，自动记录收盘价、总市值、每股收益和动态市盈率。
-          </p>
-          <div class="stock-tags" aria-label="跟踪股票">
-            <span class="stock-tag">中际旭创 <small>300308</small></span>
-            <span class="stock-tag">紫光股份 <small>000938</small></span>
-            <span class="stock-tag">新易盛 <small>300502</small></span>
-            <span class="stock-tag">澜起科技 <small>688008</small></span>
-            <span class="stock-tag">工业富联 <small>601138</small></span>
-            <span class="stock-tag">浪潮信息 <small>000977</small></span>
+      <section class="report-header">
+        <h1>每日股价报告</h1>
+        <details class="stock-list">
+          <summary>
+            <span>收录股票</span>
+            <strong>6 只</strong>
+          </summary>
+          <div class="stock-list-grid">
+            <div><span>中际旭创</span><small>300308</small></div>
+            <div><span>紫光股份</span><small>000938</small></div>
+            <div><span>新易盛</span><small>300502</small></div>
+            <div><span>澜起科技</span><small>688008</small></div>
+            <div><span>工业富联</span><small>601138</small></div>
+            <div><span>浪潮信息</span><small>000977</small></div>
           </div>
-        </div>
-
-        <aside class="summary-card" aria-live="polite">
-          <div class="summary-top">
-            <span>最新归档</span>
-            <span class="market-badge">沪深 A 股</span>
-          </div>
-          <div id="summary-content" class="waiting-state">
-            <span class="waiting-line"></span>
-            <strong>正在载入收盘档案</strong>
-            <p>请稍候</p>
-          </div>
-          <div class="summary-foot">
-            <span>交易日更新</span>
-            <span>周末及休市日跳过</span>
-          </div>
-        </aside>
+        </details>
       </section>
 
-      <section class="records-section" aria-labelledby="records-title">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">DAILY ARCHIVE</p>
-            <h2 id="records-title">每日收盘档案</h2>
-          </div>
-          <p>每个交易日一张独立表格，最新日期在前。</p>
-        </div>
-
+      <section class="records-section" aria-label="每日股价数据">
         <div id="records" class="daily-list" aria-live="polite">
-          <div class="empty-records">
-            <div class="empty-symbol">15:30</div>
-            <h3>正在读取历史记录</h3>
-            <p>交易日收市后，系统会自动写入当天数据。</p>
-          </div>
+          <div class="empty-records">正在读取每日股价数据</div>
         </div>
       </section>
 
-      <section class="method-section">
-        <div>
-          <p class="eyebrow">RECORDING RULES</p>
-          <h2>只记录真正的收盘日</h2>
-        </div>
-        <div class="rules">
-          <article>
-            <span>01</span>
-            <h3>准时</h3>
-            <p>北京时间每个工作日 15:30 检查当天收盘行情。</p>
-          </article>
-          <article>
-            <span>02</span>
-            <h3>校验</h3>
-            <p>行情日期必须与当天一致，避免节假日重复写入旧数据。</p>
-          </article>
-          <article>
-            <span>03</span>
-            <h3>归档</h3>
-            <p>一天一表，同一日期只保留一份可靠的收盘快照。</p>
-          </article>
-        </div>
-      </section>
+      <p id="export-status" class="export-status" aria-live="polite"></p>
+      <footer>数据与预测仅供信息参考，不构成投资建议。</footer>
     </main>
-
-    <footer>
-      <div class="brand">
-        <span class="brand-mark">收</span>
-        <span>收盘录</span>
-      </div>
-      <p>数据仅供信息参考，不构成投资建议。</p>
-    </footer>
   </body>
 </html>
