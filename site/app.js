@@ -69,9 +69,9 @@ function exportDay(day) {
       ),
       "每股收益（元）": Number(Number(stock.eps).toFixed(3)),
       "动态PE（倍）": Number(Number(stock.pe).toFixed(2)),
-      "2026E营业收入（亿元）": forecast?.revenue ?? "",
-      "2026E归母净利润（亿元）": forecast?.netProfit ?? "",
-      "2026E PE（倍）": Number.isFinite(forecastPe)
+      "2026预计营收（亿元）": forecast?.revenue ?? "",
+      "2026预计净利润（亿元）": forecast?.netProfit ?? "",
+      "2026预计最终PE（倍）": Number.isFinite(forecastPe)
         ? Number(forecastPe.toFixed(2))
         : "",
     };
@@ -193,9 +193,9 @@ function createDailyCard(day, index) {
     "总市值",
     "每股收益",
     "PE（动）",
-    "2026E 营收",
-    "2026E 归母净利润",
-    "2026E PE",
+    "2026预计营收",
+    "2026预计净利润",
+    "2026预计最终PE",
   ].forEach((label, columnIndex) => {
     headingRow.append(
       element("th", columnIndex >= 6 ? "forecast-column" : "", label),
