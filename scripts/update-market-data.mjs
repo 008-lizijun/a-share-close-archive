@@ -54,15 +54,16 @@ for (const stock of stocks) {
 
 async function fetchQuote(stock) {
   const url =
-    `http://push2.eastmoney.com/api/qt/stock/get?invt=2&fltt=2&secid=${stock.secid}` +
+    `https://push2.eastmoney.com/api/qt/stock/get?ut=fa5fd1943c7b386f172d6893dbfba10b&invt=2&fltt=2&secid=${stock.secid}` +
     `&fields=${fields}`;
 
   let lastError;
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
     try {
       const response = await fetch(url, {
         headers: {
           Accept: "application/json,text/plain,*/*",
+          Referer: "https://quote.eastmoney.com/",
           "User-Agent": "Mozilla/5.0",
         },
         signal: AbortSignal.timeout(20_000),
@@ -73,15 +74,19 @@ async function fetchQuote(stock) {
       return payload.data;
     } catch (error) {
       lastError = error;
-      if (attempt < 3) {
-        await new Promise((resolve) => setTimeout(resolve, attempt * 1_500));
+      if (attempt < 6) {
+        await new Promise((resolve) => setTimeout(resolve, attempt * 3_000));
       }
     }
   }
   throw new Error(`${stock.name} 行情请求失败：${lastError?.message}`);
 }
 
-const rawRows = await Promise.all(stocks.map(fetchQuote));
+const rawRows = [];
+for (const stock of stocks) {
+  rawRows.push(await fetchQuote(stock));
+  await new Promise((resolve) => setTimeout(resolve, 500));
+}
 const quoteDates = rawRows.map((data) =>
   new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Shanghai",
