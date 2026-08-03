@@ -35,8 +35,22 @@ jobs:
         with:
           node-version: "22"
 
+      - name: 检查北京时间当天记录
+        if: github.event_name == 'schedule'
+        id: daily_record
+        shell: bash
+        run: |
+          beijing_date="$(TZ=Asia/Shanghai date +%F)"
+          if node -e 'const fs = require("node:fs"); const date = process.argv[1]; const records = JSON.parse(fs.readFileSync("site/data/records.json", "utf8")); process.exit(records.some((record) => record.date === date) ? 0 : 1);' "$beijing_date"; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "${beijing_date} 已有完整归档，跳过重复行情请求"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "${beijing_date} 尚无归档，启动备用抓取"
+          fi
+
       - name: 获取当天收盘数据
-        if: github.event_name != 'push'
+        if: github.event_name != 'push' && (github.event_name != 'schedule' || steps.daily_record.outputs.exists != 'true')
         shell: bash
         run: |
           for attempt in 1 2 3; do
