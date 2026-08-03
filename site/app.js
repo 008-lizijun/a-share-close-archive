@@ -11,6 +11,9 @@ const trackedStocks = [
 ];
 
 let forecastPayload = { asOf: "", method: "", stocks: {} };
+let reportRecords = [];
+let selectedDate = "";
+let visibleMonth = "";
 
 const formatMoney = (value) => {
   if (!Number.isFinite(value)) return "—";
@@ -31,6 +34,17 @@ const formatDate = (value) =>
     day: "numeric",
     weekday: "short",
   }).format(new Date(`${value}T12:00:00+08:00`));
+
+const formatMonth = (value) => {
+  const [year, month] = value.split("-").map(Number);
+  return `${year} 年 ${month} 月`;
+};
+
+const shiftMonth = (value, offset) => {
+  const [year, month] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1 + offset, 1));
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+};
 
 const element = (tag, className, text) => {
   const node = document.createElement(tag);
@@ -143,7 +157,9 @@ function createForecastSources() {
     element(
       "summary",
       "",
-      `2026E 预测口径与来源（截至 ${forecastPayload.asOf}）`,
+      `2026预测口径与来源（每日检查，最近检查 ${
+        forecastPayload.lastCheckedAt || forecastPayload.asOf
+      }）`,
     ),
     element("p", "", forecastPayload.method),
   );
@@ -170,12 +186,12 @@ function createForecastSources() {
   return details;
 }
 
-function createDailyCard(day, index) {
+function createDailyCard(day, isLatest) {
   const card = element("article", "daily-card");
   const head = element("div", "daily-card-head");
   const date = element("div");
   date.append(element("h2", "", formatDate(day.date)));
-  if (index === 0) date.append(element("span", "latest-pill", "最新"));
+  if (isLatest) date.append(element("span", "latest-pill", "最新"));
 
   const exportButton = element("button", "export-button", "导出 XLSX");
   exportButton.type = "button";
@@ -221,15 +237,125 @@ function createDailyCard(day, index) {
   return card;
 }
 
-function renderRecords(records) {
+function createCalendar() {
+  const wrapper = element("div", "date-selector");
+  const panel = element("div", "calendar-panel");
+  panel.setAttribute("aria-label", "选择报告日期");
+  const header = element("div", "calendar-header");
+  const availableMonths = reportRecords
+    .map((record) => record.date.slice(0, 7))
+    .sort();
+  const firstMonth = availableMonths[0];
+  const lastMonth = availableMonths.at(-1);
+
+  const previous = element("button", "calendar-nav-button", "←");
+  previous.type = "button";
+  previous.setAttribute("aria-label", "上一个月");
+  previous.disabled = visibleMonth <= firstMonth;
+  previous.addEventListener("click", () => {
+    visibleMonth = shiftMonth(visibleMonth, -1);
+    renderReportView();
+  });
+
+  const next = element("button", "calendar-nav-button", "→");
+  next.type = "button";
+  next.setAttribute("aria-label", "下一个月");
+  next.disabled = visibleMonth >= lastMonth;
+  next.addEventListener("click", () => {
+    visibleMonth = shiftMonth(visibleMonth, 1);
+    renderReportView();
+  });
+  header.append(previous, element("strong", "", formatMonth(visibleMonth)), next);
+
+  const weekdays = element("div", "calendar-grid calendar-weekdays");
+  ["一", "二", "三", "四", "五", "六", "日"].forEach((weekday) =>
+    weekdays.append(element("span", "", weekday)),
+  );
+
+  const calendar = element("div", "calendar-grid");
+  const [year, month] = visibleMonth.split("-").map(Number);
+  const leadingBlankDays =
+    (new Date(Date.UTC(year, month - 1, 1)).getUTCDay() + 6) % 7;
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const availableDates = new Set(reportRecords.map((record) => record.date));
+  const latestDate = reportRecords[0].date;
+
+  for (let index = 0; index < leadingBlankDays; index += 1) {
+    calendar.append(element("span", "calendar-blank"));
+  }
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const dateValue = `${visibleMonth}-${String(day).padStart(2, "0")}`;
+    const hasRecord = availableDates.has(dateValue);
+    const classNames = ["calendar-day"];
+    if (dateValue === selectedDate) classNames.push("selected");
+    if (dateValue === latestDate) classNames.push("latest");
+    const button = element("button", classNames.join(" "), String(day));
+    button.type = "button";
+    button.disabled = !hasRecord;
+    button.setAttribute("aria-pressed", String(dateValue === selectedDate));
+    button.setAttribute(
+      "aria-label",
+      hasRecord ? `查看 ${formatDate(dateValue)}` : `${dateValue} 无收盘记录`,
+    );
+    if (hasRecord) {
+      button.addEventListener("click", () => {
+        selectedDate = dateValue;
+        exportStatus.textContent = "";
+        renderReportView();
+      });
+    }
+    calendar.append(button);
+  }
+  panel.append(
+    header,
+    weekdays,
+    calendar,
+    element("p", "calendar-note", "只有已有收盘记录的交易日可以选择"),
+  );
+
+  const selectedRecord =
+    reportRecords.find((record) => record.date === selectedDate) ||
+    reportRecords[0];
+  const copy = element("div", "selected-date-copy");
+  copy.append(
+    element("span", "", "当前展示"),
+    element("strong", "", formatDate(selectedRecord.date)),
+    element(
+      "p",
+      "",
+      "打开页面时默认显示最新交易日，可从日历切换历史日期。",
+    ),
+  );
+  wrapper.append(panel, copy);
+  return wrapper;
+}
+
+function renderReportView() {
   recordsRoot.replaceChildren();
-  if (!records.length) {
+  if (!reportRecords.length) {
     recordsRoot.append(element("div", "empty-records", "尚无收盘记录"));
     return;
   }
-  records.forEach((day, index) => {
-    recordsRoot.append(createDailyCard(day, index));
-  });
+  const selectedRecord =
+    reportRecords.find((record) => record.date === selectedDate) ||
+    reportRecords[0];
+  recordsRoot.append(
+    createCalendar(),
+    createDailyCard(selectedRecord, selectedRecord.date === reportRecords[0].date),
+  );
+}
+
+function renderRecords(records) {
+  reportRecords = records;
+  if (!reportRecords.length) {
+    renderReportView();
+    return;
+  }
+  if (!reportRecords.some((record) => record.date === selectedDate)) {
+    selectedDate = reportRecords[0].date;
+  }
+  visibleMonth = selectedDate.slice(0, 7);
+  renderReportView();
 }
 
 async function loadReport() {
