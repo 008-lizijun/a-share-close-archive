@@ -14,6 +14,7 @@ let forecastPayload = { asOf: "", method: "", stocks: {} };
 let reportRecords = [];
 let selectedDate = "";
 let visibleMonth = "";
+let calendarOpen = false;
 
 const formatMoney = (value) => {
   if (!Number.isFinite(value)) return "—";
@@ -239,33 +240,81 @@ function createDailyCard(day, isLatest) {
 
 function createCalendar() {
   const wrapper = element("div", "date-selector");
+  const picker = element("div", "date-picker");
+  const selectedRecord =
+    reportRecords.find((record) => record.date === selectedDate) ||
+    reportRecords[0];
+
+  const trigger = element("button", "date-picker-trigger");
+  trigger.type = "button";
+  trigger.setAttribute("aria-expanded", String(calendarOpen));
+  trigger.setAttribute("aria-controls", "report-calendar");
+  const triggerCopy = element("span");
+  triggerCopy.append(
+    element("small", "", "报告日期"),
+    element("strong", "", selectedRecord.date.replaceAll("-", " / ")),
+  );
+  const arrow = element(
+    "span",
+    `date-picker-arrow${calendarOpen ? " open" : ""}`,
+    "⌄",
+  );
+  arrow.setAttribute("aria-hidden", "true");
+  trigger.append(triggerCopy, arrow);
+  trigger.addEventListener("click", () => {
+    calendarOpen = !calendarOpen;
+    renderReportView();
+  });
+  picker.append(trigger);
+
+  if (!calendarOpen) {
+    wrapper.append(picker);
+    return wrapper;
+  }
+
   const panel = element("div", "calendar-panel");
+  panel.id = "report-calendar";
   panel.setAttribute("aria-label", "选择报告日期");
   const header = element("div", "calendar-header");
-  const availableMonths = reportRecords
-    .map((record) => record.date.slice(0, 7))
-    .sort();
-  const firstMonth = availableMonths[0];
-  const lastMonth = availableMonths.at(-1);
 
-  const previous = element("button", "calendar-nav-button", "←");
-  previous.type = "button";
-  previous.setAttribute("aria-label", "上一个月");
-  previous.disabled = visibleMonth <= firstMonth;
-  previous.addEventListener("click", () => {
+  const previousGroup = element("div", "calendar-nav-group");
+  const previousYear = element("button", "calendar-nav-button", "«");
+  previousYear.type = "button";
+  previousYear.setAttribute("aria-label", "上一年");
+  previousYear.addEventListener("click", () => {
+    visibleMonth = shiftMonth(visibleMonth, -12);
+    renderReportView();
+  });
+  const previousMonth = element("button", "calendar-nav-button", "‹");
+  previousMonth.type = "button";
+  previousMonth.setAttribute("aria-label", "上一个月");
+  previousMonth.addEventListener("click", () => {
     visibleMonth = shiftMonth(visibleMonth, -1);
     renderReportView();
   });
+  previousGroup.append(previousYear, previousMonth);
 
-  const next = element("button", "calendar-nav-button", "→");
-  next.type = "button";
-  next.setAttribute("aria-label", "下一个月");
-  next.disabled = visibleMonth >= lastMonth;
-  next.addEventListener("click", () => {
+  const nextGroup = element("div", "calendar-nav-group");
+  const nextMonth = element("button", "calendar-nav-button", "›");
+  nextMonth.type = "button";
+  nextMonth.setAttribute("aria-label", "下一个月");
+  nextMonth.addEventListener("click", () => {
     visibleMonth = shiftMonth(visibleMonth, 1);
     renderReportView();
   });
-  header.append(previous, element("strong", "", formatMonth(visibleMonth)), next);
+  const nextYear = element("button", "calendar-nav-button", "»");
+  nextYear.type = "button";
+  nextYear.setAttribute("aria-label", "下一年");
+  nextYear.addEventListener("click", () => {
+    visibleMonth = shiftMonth(visibleMonth, 12);
+    renderReportView();
+  });
+  nextGroup.append(nextMonth, nextYear);
+  header.append(
+    previousGroup,
+    element("strong", "", formatMonth(visibleMonth)),
+    nextGroup,
+  );
 
   const weekdays = element("div", "calendar-grid calendar-weekdays");
   ["一", "二", "三", "四", "五", "六", "日"].forEach((weekday) =>
@@ -300,6 +349,8 @@ function createCalendar() {
     if (hasRecord) {
       button.addEventListener("click", () => {
         selectedDate = dateValue;
+        visibleMonth = dateValue.slice(0, 7);
+        calendarOpen = false;
         exportStatus.textContent = "";
         renderReportView();
       });
@@ -310,23 +361,10 @@ function createCalendar() {
     header,
     weekdays,
     calendar,
-    element("p", "calendar-note", "只有已有收盘记录的交易日可以选择"),
+    element("p", "calendar-note", "双箭头切换年份，单箭头切换月份"),
   );
-
-  const selectedRecord =
-    reportRecords.find((record) => record.date === selectedDate) ||
-    reportRecords[0];
-  const copy = element("div", "selected-date-copy");
-  copy.append(
-    element("span", "", "当前展示"),
-    element("strong", "", formatDate(selectedRecord.date)),
-    element(
-      "p",
-      "",
-      "打开页面时默认显示最新交易日，可从日历切换历史日期。",
-    ),
-  );
-  wrapper.append(panel, copy);
+  picker.append(panel);
+  wrapper.append(picker);
   return wrapper;
 }
 
