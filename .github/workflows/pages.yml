@@ -1,5 +1,4 @@
 name: 更新 A 股收盘档案并发布
-# 公共 GitHub Pages 主站：收盘后自动更新并部署。
 
 on:
   schedule:
@@ -9,9 +8,6 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - "site/data/records.json"
-      - "site/data/forecasts.json"
 
 permissions:
   contents: write
