@@ -10,6 +10,7 @@ on:
       - main
     paths-ignore:
       - "site/data/records.json"
+      - "site/data/forecasts.json"
 
 permissions:
   contents: write
@@ -39,20 +40,27 @@ jobs:
 
       - name: 获取当天收盘数据
         if: github.event_name != 'push'
-        run: node scripts/update-market-data.mjs
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            node scripts/update-market-data.mjs && exit 0
+            echo "第 ${attempt} 次获取失败，稍后重试"
+            sleep $((attempt * 30))
+          done
+          exit 1
 
-      - name: 保存新的交易日记录
+      - name: 保存预测与交易日记录
         if: github.event_name != 'push'
         shell: bash
         run: |
-          if git diff --quiet -- site/data/records.json; then
-            echo "没有新的交易日数据"
+          if git diff --quiet -- site/data/records.json site/data/forecasts.json; then
+            echo "预测和交易日数据均无变化"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site/data/records.json
-          git commit -m "data: update A-share close archive"
+          git add site/data/records.json site/data/forecasts.json
+          git commit -m "data: update forecasts and A-share close archive"
           git push
 
       - name: 配置 GitHub Pages
