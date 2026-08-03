@@ -151,7 +151,7 @@ const recordsPath = path.resolve("site/data/records.json");
 const records = JSON.parse(await fs.readFile(recordsPath, "utf8"));
 const nextRecords = records.filter((record) => record.date !== today);
 nextRecords.push({ date: today, stocks: rows });
-nextRecords.sort((a, b) => a.date.localeCompare(b.date));
+nextRecords.sort((a, b) => b.date.localeCompare(a.date));
 await fs.writeFile(
   recordsPath,
   `${JSON.stringify(nextRecords, null, 2)}\n`,
