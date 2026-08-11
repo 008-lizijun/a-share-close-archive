@@ -1,5 +1,106 @@
 [
   {
+    "date": "2026-08-11",
+    "stocks": [
+      {
+        "code": "300308",
+        "name": "中际旭创",
+        "price": 886.96,
+        "marketCap": 1037507837181.36,
+        "eps": 4.902395232,
+        "pe": 45.23,
+        "changePercent": 2.59,
+        "quoteTime": "2026-08-11 15:34:15",
+        "forecast2026": {
+          "revenue": 948.6,
+          "netProfit": 300.92,
+          "eps": 27.06,
+          "asOf": "2026-07-30"
+        }
+      },
+      {
+        "code": "000938",
+        "name": "紫光股份",
+        "price": 37.39,
+        "marketCap": 106938386488.86,
+        "eps": 0.27548483,
+        "pe": 33.93,
+        "changePercent": -0.64,
+        "quoteTime": "2026-08-11 15:34:33",
+        "forecast2026": {
+          "revenue": 1202,
+          "netProfit": 28.41,
+          "eps": 0.99,
+          "asOf": "2026-07-30"
+        }
+      },
+      {
+        "code": "300502",
+        "name": "新易盛",
+        "price": 415.3,
+        "marketCap": 579034800865.2001,
+        "eps": 1.994053887,
+        "pe": 52.07,
+        "changePercent": 3.93,
+        "quoteTime": "2026-08-11 15:34:27",
+        "forecast2026": {
+          "revenue": 509.52,
+          "netProfit": 188.47,
+          "eps": 13.77,
+          "asOf": "2026-07-30"
+        }
+      },
+      {
+        "code": "688008",
+        "name": "澜起科技",
+        "price": 206.7,
+        "marketCap": 252285208940.69998,
+        "eps": 0.694263741,
+        "pe": 74.43,
+        "changePercent": -0.11,
+        "quoteTime": "2026-08-11 15:35:22",
+        "forecast2026": {
+          "revenue": 72.82,
+          "netProfit": 32.63,
+          "eps": 2.68,
+          "asOf": "2026-07-30"
+        }
+      },
+      {
+        "code": "601138",
+        "name": "工业富联",
+        "price": 66.01,
+        "marketCap": 1309908531666.84,
+        "eps": 0.533904844,
+        "pe": 30.91,
+        "changePercent": -4.58,
+        "quoteTime": "2026-08-11 15:35:17",
+        "forecast2026": {
+          "revenue": 14900,
+          "netProfit": 611.4,
+          "eps": 3.08,
+          "asOf": "2026-07-30"
+        }
+      },
+      {
+        "code": "000977",
+        "name": "浪潮信息",
+        "price": 75.11,
+        "marketCap": 110297281557.05,
+        "eps": 0.411905198,
+        "pe": 45.59,
+        "changePercent": -2.07,
+        "quoteTime": "2026-08-11 15:34:48",
+        "forecast2026": {
+          "revenue": 2187.84,
+          "netProfit": 40.05,
+          "eps": 2.73,
+          "asOf": "2026-07-30"
+        }
+      }
+    ]
+  },
+  {
     "date": "2026-08-10",
     "stocks": [
       {
